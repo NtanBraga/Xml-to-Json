@@ -27,17 +27,18 @@ parser code
 :};
 
 
-terminal OPEN_ANGLE, CLOSE_ANGLE, SLASH, ASSIGN, QUOTE_STRING, LESS_THAN, GREATER_THAN, 
-         AMPERSAND, APOSTROPHE, QUOTE_MARK;
+terminal OPEN_ANGLE, CLOSE_ANGLE, SLASH, ASSIGN, LESS_THAN, GREATER_THAN, 
+         AMPERSAND, APOSTROPHE, QUOTE_MARK, SPACE;
 
-terminal String ID, LITERAL_STRING, TEXT;
+terminal String LITERAL_STRING, TEXT;
 terminal Integer NUMBER;
 
-non terminal xml_, element, elementList, openElement, closeElement, selfCloseElement;
+non terminal xml, element, elementList, openElement, closeElement, selfCloseElement, 
+                   id, text;
 
-xml_ ::= elementList;
+xml ::= elementList;
 
-element ::= openElement TEXT closeElement      | 
+element ::= openElement text closeElement      | 
             openElement closeElement           |
             openElement element closeElement   |
 			      selfCloseElement                   ;
@@ -45,9 +46,12 @@ element ::= openElement TEXT closeElement      |
 elementList ::= elementList element   |
                 element               ;
               
-openElement ::= OPEN_ANGLE ID CLOSE_ANGLE | 
-				        OPEN_ANGLE ID ID ASSIGN LITERAL_STRING CLOSE_ANGLE;
+openElement ::= OPEN_ANGLE id CLOSE_ANGLE | 
+				        OPEN_ANGLE id SPACE id ASSIGN LITERAL_STRING CLOSE_ANGLE;
 				
-closeElement ::= OPEN_ANGLE SLASH ID CLOSE_ANGLE;
+closeElement ::= OPEN_ANGLE SLASH id CLOSE_ANGLE;
 
-selfCloseElement ::= OPEN_ANGLE ID SLASH CLOSE_ANGLE;
+selfCloseElement ::= OPEN_ANGLE id SLASH CLOSE_ANGLE;
+
+id ::= TEXT;
+text ::= TEXT;

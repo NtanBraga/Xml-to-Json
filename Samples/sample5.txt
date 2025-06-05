@@ -1,1 +1,1 @@
-<selfClose />
+<selfClose/>

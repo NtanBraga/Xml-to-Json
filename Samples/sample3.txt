@@ -1,5 +1,5 @@
 <texto>
 	<outro>
-		texto puro dentro ou numero puro
+		texto_puro_dentro_ou_numero_puro
 	</outro>
 </texto>

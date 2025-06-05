@@ -19,10 +19,16 @@ import java_cup.runtime.*;
 
 DIGIT = [0-9]
 NUMBER = {DIGIT}+
-ID = [a-zA-Z]+
+
 LITERAL_STRING = \"([^\"\\]|\\.)*\"
-TEXT = [a-zA-Z_0-9][a-zA-Z_ 0-9]+
-COMMENT = <!--[a-zA-Z_0-9]*-->
+
+//ID = [a-zA-Z]+
+SPACE = [ ]+
+
+TEXT = [a-zA-Z_0-9][a-zA-Z_0-9]+
+
+
+COMMENT = <!--(.)*-->
 
 %%
 
@@ -30,7 +36,7 @@ COMMENT = <!--[a-zA-Z_0-9]*-->
 ">" 		{return symbol(sym.CLOSE_ANGLE);}
 "/" 		{return symbol(sym.SLASH);}
 "=" 		{return symbol(sym.ASSIGN);}
-"\""		{return symbol(sym.QUOTE_STRING);}
+//"\""		{return symbol(sym.QUOTE_STRING);}
 
 "&lt;"    	{return symbol(sym.LESS_THAN);}
 "&gt;"    	{return symbol(sym.GREATER_THAN);}
@@ -39,16 +45,19 @@ COMMENT = <!--[a-zA-Z_0-9]*-->
 "&quot;"    {return symbol(sym.QUOTE_MARK);}
 
 
-{ID} {return symbol(sym.ID, yytext());}
+//{ID} {return symbol(sym.ID, yytext());}
 {NUMBER} {return symbol(sym.NUMBER, Integer.parseInt(yytext()));}
+
+{SPACE} {System.out.println("espaço encontrado"); return symbol(sym.SPACE, " ");}
 
 {LITERAL_STRING} { return symbol(sym.LITERAL_STRING, 
                    '\"' + yytext().substring(1, yytext().length() -1) + '\"'); } //(index, index) não inclusivo
 
 {TEXT} {return symbol(sym.TEXT, yytext());}
-{COMMENT} {/* nothing */}
 
-[ \t\r\n] {/* nothing */}
+{COMMENT} {System.out.println("comentário encontrado");}
+
+[\t\r\n] {/* nothing */}
 . {System.err.println("Erro: Caractere inválido!" + yytext() + 
                      " na linha " + (yyline + 1) + 
                      " e coluna " + (yycolumn + 1));}
