@@ -20,7 +20,8 @@ import java_cup.runtime.*;
 DIGIT = [0-9]
 NUMBER = {DIGIT}+
 ID = [a-zA-Z]+
-TEXT = [a-zA-Z_0-9]+
+LITERAL_STRING = \"([^\"\\]|\\.)*\"
+TEXT = [a-zA-Z_0-9][a-zA-Z_ 0-9]+
 COMMENT = <!--[a-zA-Z_0-9]*-->
 
 %%
@@ -39,11 +40,16 @@ COMMENT = <!--[a-zA-Z_0-9]*-->
 
 
 {ID} {return symbol(sym.ID, yytext());}
-{NUMBER} {return symbol(sym.NUM, Integer.parseInt(yytext()));}
+{NUMBER} {return symbol(sym.NUMBER, Integer.parseInt(yytext()));}
+
+{LITERAL_STRING} { return symbol(sym.LITERAL_STRING, 
+                   '\"' + yytext().substring(1, yytext().length() -1) + '\"'); } //(index, index) não inclusivo
+
 {TEXT} {return symbol(sym.TEXT, yytext());}
+{COMMENT} {/* nothing */}
 
 [ \t\r\n] {/* nothing */}
-. {System.err.printl("Erro: Caractere inválido!" + yytext() + 
+. {System.err.println("Erro: Caractere inválido!" + yytext() + 
                      " na linha " + (yyline + 1) + 
                      " e coluna " + (yycolumn + 1));}
 

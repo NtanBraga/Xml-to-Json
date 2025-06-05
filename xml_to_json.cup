@@ -1,5 +1,6 @@
 import java_cup.runtime.*;
-import java.io;
+import java.io.*;
+import java.util.*;
 
 parser code 
 {:
@@ -15,7 +16,7 @@ parser code
 
   StringBuilder stringJson = new StringBuilder();
 
-  public void createCodeJson()
+  public void createCodeJson() throws Exception
   {
       try(PrintWriter out = new PrintWriter("output.txt"))
       {
@@ -29,14 +30,15 @@ parser code
 terminal OPEN_ANGLE, CLOSE_ANGLE, SLASH, ASSIGN, QUOTE_STRING, LESS_THAN, GREATER_THAN, 
          AMPERSAND, APOSTROPHE, QUOTE_MARK;
 
-terminal String ID, TEXT;
+terminal String ID, LITERAL_STRING, TEXT;
 terminal Integer NUMBER;
 
 non terminal xml_, element, elementList, openElement, closeElement, selfCloseElement;
 
 xml_ ::= elementList;
 
-element ::= openElement TEXT closeElement      |
+element ::= openElement TEXT closeElement      | 
+            openElement closeElement           |
             openElement element closeElement   |
 			      selfCloseElement                   ;
 
@@ -44,7 +46,7 @@ elementList ::= elementList element   |
                 element               ;
               
 openElement ::= OPEN_ANGLE ID CLOSE_ANGLE | 
-				        OPEN_ANGLE ID ID ASSIGN QUOTE_STRING TEXT QUOTE_STRING CLOSE_ANGLE;
+				        OPEN_ANGLE ID ID ASSIGN LITERAL_STRING CLOSE_ANGLE;
 				
 closeElement ::= OPEN_ANGLE SLASH ID CLOSE_ANGLE;
 

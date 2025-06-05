@@ -1,0 +1,22 @@
+<texto></texto>
+
+<texto> alguma coisa aqui </texto>
+
+<texto>
+	<outro>
+	</outro>
+</texto>
+
+<texto>
+	<outro>
+		texto puro dentro ou número puro
+	</outro>
+</texto>
+
+<texto id="abcd"></texto>
+
+<texto id="abcd">outras coisas aqui</texto>
+
+<self-close /> 
+
+<!-- This is a comment -->

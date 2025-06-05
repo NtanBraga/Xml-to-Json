@@ -1,0 +1,5 @@
+<texto>
+	<outro>
+		texto puro dentro ou numero puro
+	</outro>
+</texto>
