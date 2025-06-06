@@ -1,1 +1,1 @@
-<texto id="aqui esta um string literal"></texto>
+<texto id="aqui esta um string literal"> informacao aqui </texto>
