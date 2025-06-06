@@ -42,9 +42,9 @@ LITERAL_STRING = \"([^\"\\]|\\.)*\"
 
 //O Jflex NÃO permite criar um MACRO se o regex possui regra de exclusão
 
-[a-zA-Z]+/(\s*>)|(\s*\/>)|(\s+[a-zA-Z]+=) {System.out.println(yytext() + " ID"); return symbol(sym.ID, yytext()); }
+[a-zA-Z_]+/(\s*>)|(\s*\/>)|(\s+[a-zA-Z]+=) {System.out.println(yytext() + " ID"); return symbol(sym.ID, yytext()); }
 
-[a-zA-Z]+/=  {System.out.println(yytext() + " ID"); return symbol(sym.ID, yytext());}
+[a-zA-Z_]+/=  {System.out.println(yytext() + " ID"); return symbol(sym.ID, yytext());}
 
 {NUMBER} {return symbol(sym.NUMBER, Integer.parseInt(yytext()));}
 
@@ -54,7 +54,7 @@ LITERAL_STRING = \"([^\"\\]|\\.)*\"
                    return symbol(sym.LITERAL_STRING, 
                    '\"' + yytext().substring(1, yytext().length() -1) + '\"'); } //(index, index) não inclusivo
 
-[a-zA-Z_0-9 ][a-zA-Z_0-9 ]+/(\s*<) {System.out.println(yytext() + " TEXT"); return symbol(sym.TEXT, yytext());}
+[a-zA-Z_0-9 ][a-zA-Z0-9,_\-':+#\. ]+/(\s*<) {System.out.println(yytext() + " TEXT"); return symbol(sym.TEXT, yytext());}
 
 //{COMMENT} {System.out.println("comentário encontrado");}
 

@@ -19,6 +19,8 @@
 
 <selfclose /> 
 
+<selfclose categoria="textos etc"/> 
+
 <texto>
 	<outro>
 	</outro>

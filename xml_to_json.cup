@@ -71,36 +71,52 @@ terminal OPEN_ANGLE, CLOSE_ANGLE, SLASH, ASSIGN, LESS_THAN, GREATER_THAN,
 terminal String LITERAL_STRING, TEXT, ID;
 terminal Integer NUMBER;
 
-non terminal xml, element, elementList, openElement, closeElement, selfCloseElement, openIdentifiedElement;
+non terminal xml, element, elementList, openElement, closeElement, selfCloseElement, openIdentifiedElement, selfCloseIdentifiedElement;
 
 xml ::= elementList:text {: stringJson.append(text); :};
 
 element ::= openElement:keyName TEXT:content closeElement
-            {: 
-                RESULT = "{\"" + keyName + "\":" + "\"" + content + "\"}"; 
-            :}
+              {: 
+                  RESULT = "\"" + keyName + "\":" + "\"" + content + "\""; 
+              :}
 
             | openIdentifiedElement:identifiedElement TEXT:content closeElement
-            {: 
-                RESULT = "{" + identifiedElement + ",\"data\":\"" + content + "\"}}"; 
-            :}
+              {: 
+                  RESULT = identifiedElement.toString() + ",\"data\":\"" + content + "\"}"; 
+              :}
 
             | openElement:keyName closeElement
               {: 
-                  RESULT = "{\"" + keyName + "\":" + "null}"; 
-              :}               
+                  RESULT = "\"" + keyName + "\":" + "null"; 
+              :}
+
+            | openIdentifiedElement:identifiedElement closeElement
+              {: 
+                  RESULT = identifiedElement.toString() + "}"; 
+              :}
+
             | openElement:keyName elementList:list closeElement
               {: 
-                  RESULT = "\"" + keyName + "\"" +":[" + list + "]"; 
+                  RESULT = "\"" + keyName + "\"" +":{\n\t" + list + "}"; 
+              :}
+
+            | openIdentifiedElement:identifiedElement elementList:list closeElement
+              {: 
+                  RESULT = identifiedElement.toString() + ",\n\t\"data\":{\n\t" + list + "} }"; 
               :}
 
 			      | selfCloseElement:keyName
               {: 
-                  RESULT = "{\"" + keyName + "\":" + "null}"; 
+                  RESULT = "\"" + keyName + "\":" + "null"; 
+              :} 
+
+            | selfCloseIdentifiedElement:identifiedElement
+              {: 
+                  RESULT = identifiedElement.toString(); 
               :} 
             ;
 
-elementList ::= elementList:list element:element  {: RESULT = list.toString() + ",\n" + element; :}  
+elementList ::= elementList:list element:element  {: RESULT = list.toString() + ",\n\t" + element; :}  
                 | element:item {: RESULT = item.toString(); :} 
                 ;
               
@@ -115,4 +131,14 @@ openIdentifiedElement ::= OPEN_ANGLE ID:keyName ID:propKey ASSIGN LITERAL_STRING
 				
 closeElement ::= OPEN_ANGLE SLASH ID CLOSE_ANGLE;
 
-selfCloseElement ::= OPEN_ANGLE ID:keyName SLASH CLOSE_ANGLE {: RESULT = keyName.toString(); :} ;
+selfCloseElement ::= OPEN_ANGLE ID:keyName SLASH CLOSE_ANGLE
+                     {: 
+                         RESULT = keyName.toString(); 
+                     :} 
+                     ;
+
+selfCloseIdentifiedElement ::= OPEN_ANGLE ID:keyName ID:propKey ASSIGN LITERAL_STRING:propContent SLASH CLOSE_ANGLE 
+                            {: 
+                                RESULT = "\"" + keyName.toString() + "\":{\"" +  propKey + "\":" + propContent + "}";
+                            :}
+                            ;
