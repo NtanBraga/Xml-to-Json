@@ -28,9 +28,9 @@ parser code
 
 
 terminal OPEN_ANGLE, CLOSE_ANGLE, SLASH, ASSIGN, LESS_THAN, GREATER_THAN, 
-         AMPERSAND, APOSTROPHE, QUOTE_MARK, SPACE;
+         AMPERSAND, APOSTROPHE, QUOTE_MARK;
 
-terminal String LITERAL_STRING, TEXT;
+terminal String LITERAL_STRING, TEXT, ID;
 terminal Integer NUMBER;
 
 non terminal xml, element, elementList, openElement, closeElement, selfCloseElement, 
@@ -47,11 +47,11 @@ elementList ::= elementList element   |
                 element               ;
               
 openElement ::= OPEN_ANGLE id CLOSE_ANGLE | 
-				        OPEN_ANGLE id SPACE id ASSIGN LITERAL_STRING CLOSE_ANGLE;
+				        OPEN_ANGLE id id ASSIGN LITERAL_STRING CLOSE_ANGLE;
 				
 closeElement ::= OPEN_ANGLE SLASH id CLOSE_ANGLE;
 
 selfCloseElement ::= OPEN_ANGLE id SLASH CLOSE_ANGLE;
 
-id ::= TEXT;
+id ::= ID;
 text ::= TEXT;

@@ -1,5 +1,5 @@
 <texto>
 	<outro>
-		texto_puro_dentro_ou_numero_puro
+		texto com espacamento
 	</outro>
 </texto>
