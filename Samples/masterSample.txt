@@ -9,7 +9,7 @@
 
 <texto>
 	<outro>
-		texto puro dentro ou número puro
+		texto puro dentro ou numero puro
 	</outro>
 </texto>
 
@@ -17,6 +17,21 @@
 
 <texto id="abcd">outras coisas aqui</texto>
 
-<self-close /> 
+<selfclose /> 
 
-<!-- This is a comment -->
+<texto>
+	<outro>
+	</outro>
+</texto>
+<texto>
+	<outro>
+	</outro>
+</texto>
+
+<texto>
+	<outro>
+	</outro>
+    
+    <palavra>
+	</palavra>
+</texto>
