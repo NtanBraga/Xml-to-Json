@@ -22,7 +22,7 @@ NUMBER = {DIGIT}+
 
 LITERAL_STRING = \"([^\"\\]|\\.)*\"
 
-TEXT = [a-zA-Z_0-9 ][a-zA-Z_0-9 ]+
+//TEXT = [a-zA-Z_0-9 ][a-zA-Z_0-9 ]+
 
 //COMMENT = <!--(.)*-->
 
@@ -42,18 +42,19 @@ TEXT = [a-zA-Z_0-9 ][a-zA-Z_0-9 ]+
 
 //ID, o Jflex não permite criar um MACRO com regra de exclusão
 //{ID} {return symbol(sym.ID, yytext());}
-[a-zA-Z]+/(>)|(\s*\/>) {System.out.println(yytext() + " ID"); return symbol(sym.ID, yytext()); }
+[a-zA-Z]+/(\s*>)|(\s*\/>)|(\s+[a-zA-Z]+=) {System.out.println(yytext() + " ID"); return symbol(sym.ID, yytext()); }
 
-[a-zA-Z]+/={LITERAL_STRING}  {System.out.println(yytext() + " ID"); return symbol(sym.ID, yytext());}
+[a-zA-Z]+/=  {System.out.println(yytext() + " ID"); return symbol(sym.ID, yytext());}
 
 {NUMBER} {return symbol(sym.NUMBER, Integer.parseInt(yytext()));}
 
 //{SPACE} {System.out.println("ESPAÇO"); return symbol(sym.SPACE, " ");}
 
-{LITERAL_STRING} { return symbol(sym.LITERAL_STRING, 
+{LITERAL_STRING} { System.out.println(yytext() + " LITERAL_STRING ");
+                   return symbol(sym.LITERAL_STRING, 
                    '\"' + yytext().substring(1, yytext().length() -1) + '\"'); } //(index, index) não inclusivo
 
-{TEXT} {System.out.println(yytext() + " TEXT"); return symbol(sym.TEXT, yytext());}
+[a-zA-Z_0-9 ][a-zA-Z_0-9 ]+/(\s*<) {System.out.println(yytext() + " TEXT"); return symbol(sym.TEXT, yytext());}
 
 //{COMMENT} {System.out.println("comentário encontrado");}
 
