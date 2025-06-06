@@ -20,9 +20,47 @@ parser code
   {
       try(PrintWriter out = new PrintWriter("output.txt"))
       {
-          out.println("COIso rodanddo");
+          out.println("{");
+          out.println(stringJson.toString());
+          out.println("}");
       }
   }
+
+  /*
+  @Override
+  public void syntax_error(Symbol s) 
+  {
+    String nome = nomesTokens.getOrDefault(s.sym, nomeSimbolo(s));
+    System.err.println("Syntactic error: symbol '" + nome + 
+                        "' unexpected on the line " + s.left + ", column " + s.right);
+  }
+
+   static final Map<Integer, String> nomesTokens = Map.of(
+    sym.OPEN_ANGLE, "<",
+    sym.CLOSE_ANGLE, ">",
+    sym.SLASH, "/",
+    sym.ASSIGN, "=",
+    sym.LESS_THAN, "<",
+    sym.GREATER_THAN, ">",
+    sym.AMPERSAND, "&",
+    sym.APOSTROPHE, "\"",
+    sym.QUOTE_MARK, "\""
+  );
+
+  String nomeSimbolo(Symbol s) {
+    try {
+        java.lang.reflect.Field[] fields = sym.class.getFields();
+        for (java.lang.reflect.Field f : fields) {
+            if (f.getType() == int.class && f.getInt(null) == s.sym) {
+                return f.getName();
+            }
+        }
+    } catch (Exception e) {
+        // ignore
+    }
+    return "unknown";
+  }
+  */
 
 :};
 
@@ -35,19 +73,22 @@ terminal Integer NUMBER;
 
 non terminal xml, element, elementList, openElement, closeElement, selfCloseElement;
 
-xml ::= elementList;
+xml ::= elementList:text {: stringJson.append(text); :};
 
-element ::= openElement TEXT closeElement          | 
-            openElement closeElement               |
-            openElement elementList closeElement   |
-			      selfCloseElement                       ;
+element ::= openElement:keyName TEXT:content closeElement {: RESULT = "{\"" + keyName + "\":" + "\"" + content + "\"}"; :}
+            | openElement:keyName closeElement {: RESULT = "{\"" + keyName + "\":" + "null}"; :}               
+            | openElement:keyName elementList:list closeElement {: RESULT = "\"" + keyName + "\"" +":[" + list + "]"; :}
+			      | selfCloseElement:keyName {: RESULT = "{\"" + keyName + "\":" + "null}"; :} 
+            ;
 
-elementList ::= elementList element   |
-                element               ;
+elementList ::= elementList:list element:element  {: RESULT = list.toString() + "," + element; :}  
+                | element:item {: RESULT = item.toString(); :} 
+                ;
               
-openElement ::= OPEN_ANGLE ID CLOSE_ANGLE | 
-				        OPEN_ANGLE ID ID ASSIGN LITERAL_STRING CLOSE_ANGLE;
+openElement ::= OPEN_ANGLE ID:keyName CLOSE_ANGLE {: RESULT = keyName.toString(); :} 
+              | OPEN_ANGLE ID ID ASSIGN LITERAL_STRING CLOSE_ANGLE
+              ;
 				
 closeElement ::= OPEN_ANGLE SLASH ID CLOSE_ANGLE;
 
-selfCloseElement ::= OPEN_ANGLE ID SLASH CLOSE_ANGLE;
+selfCloseElement ::= OPEN_ANGLE ID:keyName SLASH CLOSE_ANGLE {: RESULT = keyName.toString(); :} ;
