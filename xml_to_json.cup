@@ -33,25 +33,21 @@ terminal OPEN_ANGLE, CLOSE_ANGLE, SLASH, ASSIGN, LESS_THAN, GREATER_THAN,
 terminal String LITERAL_STRING, TEXT, ID;
 terminal Integer NUMBER;
 
-non terminal xml, element, elementList, openElement, closeElement, selfCloseElement, 
-                   id, text;
+non terminal xml, element, elementList, openElement, closeElement, selfCloseElement;
 
 xml ::= elementList;
 
-element ::= openElement text closeElement      | 
-            openElement closeElement           |
-            openElement element closeElement   |
-			      selfCloseElement                   ;
+element ::= openElement TEXT closeElement          | 
+            openElement closeElement               |
+            openElement elementList closeElement   |
+			      selfCloseElement                       ;
 
 elementList ::= elementList element   |
                 element               ;
               
-openElement ::= OPEN_ANGLE id CLOSE_ANGLE | 
-				        OPEN_ANGLE id id ASSIGN LITERAL_STRING CLOSE_ANGLE;
+openElement ::= OPEN_ANGLE ID CLOSE_ANGLE | 
+				        OPEN_ANGLE ID ID ASSIGN LITERAL_STRING CLOSE_ANGLE;
 				
-closeElement ::= OPEN_ANGLE SLASH id CLOSE_ANGLE;
+closeElement ::= OPEN_ANGLE SLASH ID CLOSE_ANGLE;
 
-selfCloseElement ::= OPEN_ANGLE id SLASH CLOSE_ANGLE;
-
-id ::= ID;
-text ::= TEXT;
+selfCloseElement ::= OPEN_ANGLE ID SLASH CLOSE_ANGLE;

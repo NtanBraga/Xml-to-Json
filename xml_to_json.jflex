@@ -40,8 +40,8 @@ LITERAL_STRING = \"([^\"\\]|\\.)*\"
 "&apost;"   {return symbol(sym.APOSTROPHE);}
 "&quot;"    {return symbol(sym.QUOTE_MARK);}
 
-//ID, o Jflex não permite criar um MACRO com regra de exclusão
-//{ID} {return symbol(sym.ID, yytext());}
+//O Jflex NÃO permite criar um MACRO se o regex possui regra de exclusão
+
 [a-zA-Z]+/(\s*>)|(\s*\/>)|(\s+[a-zA-Z]+=) {System.out.println(yytext() + " ID"); return symbol(sym.ID, yytext()); }
 
 [a-zA-Z]+/=  {System.out.println(yytext() + " ID"); return symbol(sym.ID, yytext());}

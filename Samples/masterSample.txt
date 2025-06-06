@@ -29,9 +29,8 @@
 </texto>
 
 <texto>
-	<outro>
-	</outro>
-    
-    <palavra>
-	</palavra>
+<outro>
+</outro>
+<palavra>
+</palavra>
 </texto>
