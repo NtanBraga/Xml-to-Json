@@ -1,0 +1,5 @@
+<texto>
+	<outro>
+		texto com espacamento
+	</outro>
+</texto>

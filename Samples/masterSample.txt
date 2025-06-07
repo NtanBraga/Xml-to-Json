@@ -1,0 +1,38 @@
+<texto></texto>
+
+<texto> alguma coisa aqui </texto>
+
+<texto>
+	<outro>
+	</outro>
+</texto>
+
+<texto>
+	<outro>
+		texto puro dentro ou numero puro
+	</outro>
+</texto>
+
+<texto id="abcd"></texto>
+
+<texto id="abcd">outras coisas aqui</texto>
+
+<selfclose /> 
+
+<selfclose categoria="textos etc"/> 
+
+<texto>
+	<outro>
+	</outro>
+</texto>
+<texto>
+	<outro>
+	</outro>
+</texto>
+
+<texto>
+<outro>
+</outro>
+<palavra>
+</palavra>
+</texto>

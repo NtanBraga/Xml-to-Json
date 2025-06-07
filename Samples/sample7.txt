@@ -1,0 +1,8 @@
+<texto>
+	<outro>
+	</outro>
+</texto>
+<texto>
+	<outro>
+	</outro>
+</texto>

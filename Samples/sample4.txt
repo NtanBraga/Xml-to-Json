@@ -1,0 +1,1 @@
+<texto categoria="aqui esta um string literal"></texto>
