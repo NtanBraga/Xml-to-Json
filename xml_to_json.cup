@@ -69,27 +69,37 @@ element ::= openElement:keyName TEXT:content closeElement
               :}
 
             | openElement:keyName elementList:list closeElement
-              {: 
-                  RESULT = "\"" + keyName + "\"" +":{\n\t" + list + "\n\t}";
-
+              {:  
                   StringBuilder Blist = new StringBuilder();
                   Blist.append(list);
 
+                  //todo elemento termina com } }
                   String[] strArray = Blist.toString().trim().split("} }");
 
+                  //o primeiro elemento começa com "palavra-chave":
+                  //fazendo split nas aspas gera um array em que o index 1 contém a palavra-chave
+
+                  //OBS: o Java gera uma empty-string/null no index 0 se tu fizer split e não tiver nada na esquerda
                   String MainKeyWord = strArray[0].trim().split("\"")[1].trim();
                   boolean duplicateKeyword = false;
                   boolean entireLayerIsList = false;
 
                   for(int i = 1; i < strArray.length; i++)
                   {
+                    //os itens seguintes sempre começam com ,"palavra-chave":
+                    //fazendo split nas aspas gera um array em que o index 1 contém a palavra-chave daquele item
                     String keyword = strArray[i].trim().split("\"")[1].trim();
 
                     if(MainKeyWord.equals(keyword))
                     {
                       duplicateKeyword = true;
+
+                      //se as palavra chaves forem iguais, logo dá pra converter pra lista
+                      //faz-se replace da palavra chave duplicada por uma empty-string ( "\"palavra-chave\":" --> "" )
                       strArray[i] = strArray[i].replace("\"" + keyword + "\":", "");
 
+                      //a análise é sequencial, portanto ela NÃO DETECTA LISTAS NÃO LINEARES
+                      //se o último elemento da camada atual tem a mesma palavra chave, logo toda a camada atual é uma lista
                       if(i == strArray.length - 1)
                       {
                         entireLayerIsList = true;
@@ -99,9 +109,13 @@ element ::= openElement:keyName TEXT:content closeElement
                     {
                       StringBuilder Bitem = new StringBuilder();
                       Bitem.append(strArray[i]);
-
+                      
+                      //se o segundo item não tem a mesma palavra-chave pressupõe-se que então não existe lista
+                      //não detecta-se listas ão lineares
                       if(i == 1){ break; }
 
+                      //todo elemento depois do primeiro começa com ,"palavra-chave":
+                      //insere-se a delimitação dee lista antes da vírgula --> ],"palavra-chave":
                       strArray[i] = Bitem.insert(0, "]").toString();
                       break;
                     }
@@ -112,13 +126,17 @@ element ::= openElement:keyName TEXT:content closeElement
                     StringBuilder Bitem = new StringBuilder();
                     Bitem.append(strArray[0]);
 
+                    //se detectou-se uma lista, insere-se o símbolo de começo de lista [ no item inicial
+                    //"palavra-chave":{   -->   "palavra-chave":[{
                     int referenceIndex = Bitem.indexOf(":");
                     strArray[0] = Bitem.insert(referenceIndex + 1, "[").toString();
                   }
 
+                  //junta tudo em uma string só adicionando de volta a string } } que foi usada no split
                   list = String.join("} }", strArray) + "} }";
                   if(entireLayerIsList == true)
                   {
+                    //insere o delimitador de lista no final da lista caso todos os elementos façam parte dela
                     list = list + "]";
                   }
 
@@ -152,7 +170,7 @@ elementList ::= elementList:list element:element  {: RESULT = list.toString() + 
                 | element:item {: RESULT = item.toString(); :} 
                 ;
 
-//Tive que diferenciar tags identificadas das não identificadas pra conseguir adaptar a forma de conversão
+//é necessário diferenciar tags identificadas das não identificadas para conseguir adaptar a forma de conversão
 
 //openElement == <tag>
 openElement ::= OPEN_ANGLE ID:keyName CLOSE_ANGLE {: RESULT = keyName.toString(); :}
