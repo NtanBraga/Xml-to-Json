@@ -108,19 +108,25 @@ element ::= openElement:keyName TEXT:content closeElement
                   StringBuilder Blist = new StringBuilder();
                   Blist.append(list);
 
-                  String[] strArray = Blist.toString().split("} }");
+                  String[] strArray = Blist.toString().trim().split("} }");
 
                   String MainKeyWord = strArray[0].trim().split("\"")[1].trim();
                   boolean duplicateKeyword = false;
+                  boolean entireLayerIsList = false;
 
                   for(int i = 1; i < strArray.length; i++)
                   {
-                    String keyword = strArray[i].split("\"")[1].trim();
+                    String keyword = strArray[i].trim().split("\"")[1].trim();
 
                     if(MainKeyWord.equals(keyword))
                     {
                       duplicateKeyword = true;
                       strArray[i] = strArray[i].replace("\"" + keyword + "\":", "");
+
+                      if(i == strArray.length - 1)
+                      {
+                        entireLayerIsList = true;
+                      }
                     }
                     else
                     {
@@ -143,7 +149,11 @@ element ::= openElement:keyName TEXT:content closeElement
                     strArray[0] = Bitem.insert(referenceIndex + 1, "[").toString();
                   }
 
-                  list = String.join("} }", strArray);
+                  list = String.join("} }", strArray) + "} }";
+                  if(entireLayerIsList == true)
+                  {
+                    list = list + "]";
+                  }
 
                   RESULT = "\"" + keyName + "\"" +":{\n\t" + list + "\n\t}";
               :}
