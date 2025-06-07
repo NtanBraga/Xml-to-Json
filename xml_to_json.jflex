@@ -20,10 +20,10 @@ import java_cup.runtime.*;
 DIGIT = [0-9]
 NUMBER = {DIGIT}+
 
+//Captura textos que estejam entre aspas, INCLUINDO as próprias aspas de delimitação
 LITERAL_STRING = \"([^\"\\]|\\.)*\"
 
 //TEXT = [a-zA-Z_0-9 ][a-zA-Z_0-9 ]+
-
 //COMMENT = <!--(.)*-->
 
 %%
@@ -41,22 +41,24 @@ LITERAL_STRING = \"([^\"\\]|\\.)*\"
 "&quot;"    {return symbol(sym.QUOTE_MARK);}
 
 //O Jflex NÃO permite criar um MACRO se o regex possui regra de exclusão
-
+//ID de uma tag não identificada --> <tag >
 [a-zA-Z_]+/(\s*>)|(\s*\/>)|(\s+[a-zA-Z]+=) {System.out.println(yytext() + " ID"); return symbol(sym.ID, yytext()); }
 
+//O Jflex NÃO permite criar um MACRO se o regex possui regra de exclusão
+//ID de uma tag identificada --> <tag id="placeholder">
 [a-zA-Z_]+/=  {System.out.println(yytext() + " ID"); return symbol(sym.ID, yytext());}
 
 {NUMBER} {return symbol(sym.NUMBER, Integer.parseInt(yytext()));}
-
-//{SPACE} {System.out.println("ESPAÇO"); return symbol(sym.SPACE, " ");}
 
 {LITERAL_STRING} { System.out.println(yytext() + " LITERAL_STRING ");
                    return symbol(sym.LITERAL_STRING, 
                    '\"' + yytext().substring(1, yytext().length() -1) + '\"'); } //(index, index) não inclusivo
 
+//O Jflex NÃO permite criar um MACRO se o regex possui regra de exclusão
+//TEXT
+//todo texto entre tags sempre aparece logo antes de um "OPEN_ANGLE <" da tag de fechamento
+//<tag> texto escrito aqui </tag>
 [a-zA-Z_0-9 ][a-zA-Z0-9,_\-':+#\. ]+/(\s*<) {System.out.println(yytext() + " TEXT"); return symbol(sym.TEXT, yytext());}
-
-//{COMMENT} {System.out.println("comentário encontrado");}
 
 [ \t\r\n] {/* nothing */}
 . {System.err.println("Erro: Caractere inválido!" + yytext() + 
