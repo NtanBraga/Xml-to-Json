@@ -15,6 +15,7 @@ parser code
   }
 
   StringBuilder stringJson = new StringBuilder();
+  Integer contador = 0;
 
   public void createCodeJson() throws Exception
   {
@@ -24,6 +25,11 @@ parser code
           out.println(stringJson.toString());
           out.println("}");
       }
+  }
+
+  public void convertLists()
+  {
+
   }
 
   /*
@@ -97,12 +103,55 @@ element ::= openElement:keyName TEXT:content closeElement
 
             | openElement:keyName elementList:list closeElement
               {: 
-                  RESULT = "\"" + keyName + "\"" +":{\n\t" + list + "}"; 
+                  RESULT = "\"" + keyName + "\"" +":{\n\t" + list + "\n\t}";
+
+                  StringBuilder Blist = new StringBuilder();
+                  Blist.append(list);
+
+                  String[] strArray = Blist.toString().split("} }");
+
+                  String MainKeyWord = strArray[0].trim().split("\"")[1].trim();
+                  boolean duplicateKeyword = false;
+
+                  for(int i = 1; i < strArray.length; i++)
+                  {
+                    String keyword = strArray[i].split("\"")[1].trim();
+
+                    if(MainKeyWord.equals(keyword))
+                    {
+                      duplicateKeyword = true;
+                      strArray[i] = strArray[i].replace("\"" + keyword + "\":", "");
+                    }
+                    else
+                    {
+                      StringBuilder Bitem = new StringBuilder();
+                      Bitem.append(strArray[i]);
+
+                      if(i == 1){ break; }
+
+                      strArray[i] = Bitem.insert(0, "]").toString();
+                      break;
+                    }
+                  }
+
+                  if(duplicateKeyword == true)
+                  {
+                    StringBuilder Bitem = new StringBuilder();
+                    Bitem.append(strArray[0]);
+
+                    int referenceIndex = Bitem.indexOf(":");
+                    strArray[0] = Bitem.insert(referenceIndex + 1, "[").toString();
+                  }
+
+                  list = String.join("} }", strArray);
+
+                  RESULT = "\"" + keyName + "\"" +":{\n\t" + list + "\n\t}";
               :}
 
             | openIdentifiedElement:identifiedElement elementList:list closeElement
               {: 
-                  RESULT = identifiedElement.toString() + ",\n\t\"data\":{\n\t" + list + "} }"; 
+                  RESULT = identifiedElement.toString() + ",\n\t\t\"data\":{\n\t" + list + "} }";
+                  contador = contador + 1;
               :}
 
 			      | selfCloseElement:keyName
