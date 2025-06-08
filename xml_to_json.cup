@@ -20,47 +20,13 @@ parser code
   {
       try(PrintWriter out = new PrintWriter("output.txt"))
       {
+        //A intellisense pode estar visualmente bugada aqui, mas as chaves estão entre aspas
+        //Então é só bug visual
           out.println("{");
           out.println(stringJson.toString());
           out.println("}");
       }
   }
-
-  /*
-  @Override
-  public void syntax_error(Symbol s) 
-  {
-    String nome = nomesTokens.getOrDefault(s.sym, nomeSimbolo(s));
-    System.err.println("Syntactic error: symbol '" + nome + 
-                        "' unexpected on the line " + s.left + ", column " + s.right);
-  }
-
-   static final Map<Integer, String> nomesTokens = Map.of(
-    sym.OPEN_ANGLE, "<",
-    sym.CLOSE_ANGLE, ">",
-    sym.SLASH, "/",
-    sym.ASSIGN, "=",
-    sym.LESS_THAN, "<",
-    sym.GREATER_THAN, ">",
-    sym.AMPERSAND, "&",
-    sym.APOSTROPHE, "\"",
-    sym.QUOTE_MARK, "\""
-  );
-
-  String nomeSimbolo(Symbol s) {
-    try {
-        java.lang.reflect.Field[] fields = sym.class.getFields();
-        for (java.lang.reflect.Field f : fields) {
-            if (f.getType() == int.class && f.getInt(null) == s.sym) {
-                return f.getName();
-            }
-        }
-    } catch (Exception e) {
-        // ignore
-    }
-    return "unknown";
-  }
-  */
 
 :};
 
@@ -77,68 +43,161 @@ xml ::= elementList:text {: stringJson.append(text); :};
 
 element ::= openElement:keyName TEXT:content closeElement
               {: 
+                  //formatação --> "keyname":"content"
                   RESULT = "\"" + keyName + "\":" + "\"" + content + "\""; 
               :}
 
             | openIdentifiedElement:identifiedElement TEXT:content closeElement
               {: 
+                  //formatação --> "keyname":{"propKey":"propContent", "data":"content" }
+
+                    //uma tag Identificada pode ter conteúdo, então foi necessário colocar 
+                    //essa chave genérica "data:" porque no XML não existe chave mas no JSON <<precisa>> existir uma
                   RESULT = identifiedElement.toString() + ",\"data\":\"" + content + "\"}"; 
               :}
 
             | openElement:keyName closeElement
               {: 
+                  //formatação --> "keyname": null
                   RESULT = "\"" + keyName + "\":" + "null"; 
               :}
 
             | openIdentifiedElement:identifiedElement closeElement
               {: 
+                  //formatação --> "keyname":{"propKey":"propContent"}
                   RESULT = identifiedElement.toString() + "}"; 
               :}
 
             | openElement:keyName elementList:list closeElement
-              {: 
-                  RESULT = "\"" + keyName + "\"" +":{\n\t" + list + "}"; 
+              {:  
+                  StringBuilder Blist = new StringBuilder();
+                  Blist.append(list);
+
+                  //todo elemento termina com } }
+                  String[] strArray = Blist.toString().trim().split("} }");
+
+                  //o primeiro elemento começa com "palavra-chave":
+                  //fazendo split nas aspas gera um array em que o index 1 contém a palavra-chave
+
+                  //OBS: o Java gera uma empty-string/null no index 0 se tu fizer split e não tiver nada na esquerda
+                  String MainKeyWord = strArray[0].trim().split("\"")[1].trim();
+                  boolean duplicateKeyword = false;
+                  boolean entireLayerIsList = false;
+
+                  for(int i = 1; i < strArray.length; i++)
+                  {
+                    //os itens seguintes sempre começam com ,"palavra-chave":
+                    //fazendo split nas aspas gera um array em que o index 1 contém a palavra-chave daquele item
+                    String keyword = strArray[i].trim().split("\"")[1].trim();
+
+                    if(MainKeyWord.equals(keyword))
+                    {
+                      duplicateKeyword = true;
+
+                      //se as palavra chaves forem iguais, logo dá pra converter pra lista
+                      //faz-se replace da palavra chave duplicada por uma empty-string ( "\"palavra-chave\":" --> "" )
+                      strArray[i] = strArray[i].replace("\"" + keyword + "\":", "");
+
+                      //a análise é sequencial, portanto ela NÃO DETECTA LISTAS NÃO LINEARES
+                      //se o último elemento da camada atual tem a mesma palavra chave, logo toda a camada atual é uma lista
+                      if(i == strArray.length - 1)
+                      {
+                        entireLayerIsList = true;
+                      }
+                    }
+                    else
+                    {
+                      StringBuilder Bitem = new StringBuilder();
+                      Bitem.append(strArray[i]);
+                      
+                      //se o segundo item não tem a mesma palavra-chave pressupõe-se que então não existe lista
+                      //não detecta-se listas ão lineares
+                      if(i == 1){ break; }
+
+                      //todo elemento depois do primeiro começa com ,"palavra-chave":
+                      //insere-se a delimitação dee lista antes da vírgula --> ],"palavra-chave":
+                      strArray[i] = Bitem.insert(0, "]").toString();
+                      break;
+                    }
+                  }
+
+                  if(duplicateKeyword == true)
+                  {
+                    StringBuilder Bitem = new StringBuilder();
+                    Bitem.append(strArray[0]);
+
+                    //se detectou-se uma lista, insere-se o símbolo de começo de lista [ no item inicial
+                    //"palavra-chave":{   -->   "palavra-chave":[{
+                    int referenceIndex = Bitem.indexOf(":");
+                    strArray[0] = Bitem.insert(referenceIndex + 1, "[").toString();
+                  }
+
+                  //junta tudo em uma string só adicionando de volta a string } } que foi usada no split
+                  list = String.join("} }", strArray) + "} }";
+                  if(entireLayerIsList == true)
+                  {
+                    //insere o delimitador de lista no final da lista caso todos os elementos façam parte dela
+                    list = list + "]";
+                  }
+
+                  RESULT = "\"" + keyName + "\"" +":{\n\t" + list + "\n\t}";
               :}
 
             | openIdentifiedElement:identifiedElement elementList:list closeElement
               {: 
-                  RESULT = identifiedElement.toString() + ",\n\t\"data\":{\n\t" + list + "} }"; 
+                  //formatação --> "keyname":{"propKey":"propContent", "data":{ FORMATAÇÃO-RECURSIVA-AQUI } }
+                  //IMPORTANTE --> todo elemento sempre vai terminar com a substring  "} }"
+                  //característica importante para possibilitar analisá-los individualmente depois
+                  RESULT = identifiedElement.toString() + ",\n\t\t\"data\":{\n\t" + list + "} }";
               :}
 
 			      | selfCloseElement:keyName
               {: 
+                  //formatação --> "keyname": null
                   RESULT = "\"" + keyName + "\":" + "null"; 
               :} 
 
             | selfCloseIdentifiedElement:identifiedElement
               {: 
+                  //formatação --> "keyName": {"propKey":"propContent"}
                   RESULT = identifiedElement.toString(); 
               :} 
             ;
 
+//possibilita expansão horizontal (um item do lado do outro)
+//também possibilita recursão de itens (um item dentro do outro dentro do outro dentro do outro)
 elementList ::= elementList:list element:element  {: RESULT = list.toString() + ",\n\t" + element; :}  
                 | element:item {: RESULT = item.toString(); :} 
                 ;
-              
+
+//é necessário diferenciar tags identificadas das não identificadas para conseguir adaptar a forma de conversão
+
+//openElement == <tag>
 openElement ::= OPEN_ANGLE ID:keyName CLOSE_ANGLE {: RESULT = keyName.toString(); :}
               ;
 
+//openIdentifiedElement == <tag id="placeholder">
 openIdentifiedElement ::= OPEN_ANGLE ID:keyName ID:propKey ASSIGN LITERAL_STRING:propContent CLOSE_ANGLE
                           {:  
+                              //formatação --> "keyname":{"propKey":"propContent"
+                              //Não se fecha as chaves porque não tem como saber se já terminou o object
                               RESULT = "\"" + keyName.toString() + "\":{" + "\"" + propKey + "\":" + propContent; 
                           :}
                           ;
-				
+//</termo>
 closeElement ::= OPEN_ANGLE SLASH ID CLOSE_ANGLE;
 
+//<termo/>
 selfCloseElement ::= OPEN_ANGLE ID:keyName SLASH CLOSE_ANGLE
                      {: 
                          RESULT = keyName.toString(); 
                      :} 
                      ;
 
+//<termo id="placeholder">
 selfCloseIdentifiedElement ::= OPEN_ANGLE ID:keyName ID:propKey ASSIGN LITERAL_STRING:propContent SLASH CLOSE_ANGLE 
                             {: 
+                                //formatação --> "keyName": {"propKey":"propContent"}
                                 RESULT = "\"" + keyName.toString() + "\":{\"" +  propKey + "\":" + propContent + "}";
                             :}
                             ;
