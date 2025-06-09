@@ -24,7 +24,7 @@ NUMBER = {DIGIT}+
 LITERAL_STRING = \"([^\"\\]|\\.)*\"
 
 //TEXT = [a-zA-Z_0-9 ][a-zA-Z_0-9 ]+
-//COMMENT = <!--(.)*-->
+COMMENT = "<!--"[^]*?"-->"
 
 %%
 
@@ -53,6 +53,10 @@ LITERAL_STRING = \"([^\"\\]|\\.)*\"
 {LITERAL_STRING} { System.out.println(yytext() + " LITERAL_STRING ");
                    return symbol(sym.LITERAL_STRING, 
                    '\"' + yytext().substring(1, yytext().length() -1) + '\"'); } //(index, index) não inclusivo
+
+{COMMENT} { String string_comment = yytext().substring(4, yytext().length() - 3);
+            System.out.println("COMENTÁRIO: " + string_comment );
+            return symbol(sym.COMMENT, string_comment);}
 
 //O Jflex NÃO permite criar um MACRO se o regex possui regra de exclusão
 //TEXT

@@ -34,12 +34,39 @@ parser code
 terminal OPEN_ANGLE, CLOSE_ANGLE, SLASH, ASSIGN, LESS_THAN, GREATER_THAN, 
          AMPERSAND, APOSTROPHE, QUOTE_MARK;
 
-terminal String LITERAL_STRING, TEXT, ID;
+terminal String LITERAL_STRING, TEXT, ID, COMMENT;
 terminal Integer NUMBER;
 
-non terminal xml, element, elementList, openElement, closeElement, selfCloseElement, openIdentifiedElement, selfCloseIdentifiedElement;
+non terminal xml, element, elementList, openElement, closeElement, selfCloseElement, openIdentifiedElement, selfCloseIdentifiedElement, commentList;
 
-xml ::= elementList:text {: stringJson.append(text); :};
+xml ::= commentList:comments elementList:text
+                              {:
+                                String result = "";
+                                if (!comments.toString().isEmpty()) {
+                                  result = "\"comment\":[" + comments + "]";
+                                if (!text.toString().isEmpty()) {
+                                  result += ",\n\t" + text;
+                                }
+                                } else {
+                                  result = text.toString();
+                                }
+                                stringJson.append(result);
+                                RESULT = result;
+                              :}
+      | elementList:text {: stringJson.append(text); RESULT = text; :}
+      | commentList:comment {: String result = "\"comment\":[" + comment + "]";
+                               stringJson.append(result);
+                               RESULT = result; :}
+                            ;
+
+commentList ::= commentList:list COMMENT:comment
+                {:
+                  String result = list.toString().isEmpty() ? "\"" + comment + "\"" : list + ",\"" + comment + "\"";
+                  RESULT = result;
+                :}
+                | COMMENT:comment
+                {: RESULT = "\"" + comment + "\""; :}
+                ;
 
 element ::= openElement:keyName TEXT:content closeElement
               {: 
