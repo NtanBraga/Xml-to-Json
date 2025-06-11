@@ -1,4 +1,7 @@
-<!-- Comment at  level -->
 <root>
-    <!-- Comment at root level -->
+  <!-- Comment at root level -->
+  <item>
+    <!-- Comment inside item -->
+    subtext
+  </item>
 </root>

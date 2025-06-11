@@ -68,7 +68,18 @@ commentList ::= commentList:list COMMENT:comment
                 {: RESULT = "\"" + comment + "\""; :}
                 ;
 
-element ::= openElement:keyName TEXT:content closeElement
+element ::= 
+              openElement:keyName commentList:comments elementList:list closeElement
+              {:
+                  RESULT = "\"" + keyName + "\":{\"comment\":["+ comments + "],\n\t" + list + "}";
+              :}
+            |  
+              openElement:keyName commentList:comments TEXT:content closeElement
+              {:
+                  RESULT = "\"" + keyName + "\":{\"comment\":[" + comments + "],\"data\":\"" + content + "\"}";
+              :}
+            |
+              openElement:keyName TEXT:content closeElement
               {: 
                   //formatação --> "keyname":"content"
                   RESULT = "\"" + keyName + "\":" + "\"" + content + "\""; 
