@@ -1,1 +1,4 @@
-<!-- This is a comment --><!-- alo -->
+<!-- Comment at  level -->
+<root>
+    <!-- Comment at root level -->
+</root>

@@ -73,7 +73,10 @@ element ::= openElement:keyName TEXT:content closeElement
                   //formatação --> "keyname":"content"
                   RESULT = "\"" + keyName + "\":" + "\"" + content + "\""; 
               :}
-
+            | openElement:keyName commentList:comments closeElement
+              {:
+                    RESULT = "\"" + keyName + "\":{\"comment\":[" + comments + "]}";
+              :}
             | openIdentifiedElement:identifiedElement TEXT:content closeElement
               {: 
                   //formatação --> "keyname":{"propKey":"propContent", "data":"content" }

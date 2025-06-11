@@ -64,7 +64,7 @@ COMMENT = "<!--"[^\-]*"-->"
 //<tag> texto escrito aqui </tag>
 [a-zA-Z_0-9 ][a-zA-Z0-9,_\-':+#\. ]+/(\s*<) {System.out.println(yytext() + " TEXT"); return symbol(sym.TEXT, yytext());}
 
-[ \t\r\n] {/* nothing */}
+[ \t\r\n]+ {/* nothing */}
 . {System.err.println("Erro: Caractere inválido!" + yytext() + 
                      " na linha " + (yyline + 1) + 
                      " e coluna " + (yycolumn + 1));}
