@@ -1,5 +1,7 @@
 <root>
   <!-- Comment at root level -->
+  <item>text</item>
+  <!-- Comment between elements -->
   <item>
     <!-- Comment inside item -->
     subtext

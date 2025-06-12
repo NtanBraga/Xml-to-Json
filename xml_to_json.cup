@@ -207,9 +207,13 @@ element ::=
 
 //possibilita expansão horizontal (um item do lado do outro)
 //também possibilita recursão de itens (um item dentro do outro dentro do outro dentro do outro)
-elementList ::= elementList:list element:element  {: RESULT = list.toString() + ",\n\t" + element; :}  
-                | element:item {: RESULT = item.toString(); :} 
-                ;
+elementList ::= elementList:list commentList:comments element:element
+                {:
+                  RESULT = list.toString() + ",\n\t" + "\"comment\":[" + comments + "],\n\t" + element;
+                :}
+              | elementList:list element:element  {: RESULT = list.toString() + ",\n\t" + element; :}
+              | element:item {: RESULT = item.toString(); :} 
+               ;
 
 //é necessário diferenciar tags identificadas das não identificadas para conseguir adaptar a forma de conversão
 
