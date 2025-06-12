@@ -116,7 +116,7 @@ element ::= openElement:keyName TEXT:content closeElement
 
                       //todo elemento depois do primeiro começa com ,"palavra-chave":
                       //insere-se a delimitação dee lista antes da vírgula --> ],"palavra-chave":
-                      strArray[i] = Bitem.insert(0, "]").toString();
+                      strArray[i] = Bitem.insert(0, "\n]").toString();
                       break;
                     }
                   }
@@ -129,11 +129,18 @@ element ::= openElement:keyName TEXT:content closeElement
                     //se detectou-se uma lista, insere-se o símbolo de começo de lista [ no item inicial
                     //"palavra-chave":{   -->   "palavra-chave":[{
                     int referenceIndex = Bitem.indexOf(":");
-                    strArray[0] = Bitem.insert(referenceIndex + 1, "[").toString();
+                    strArray[0] = Bitem.insert(referenceIndex + 1, "[\n\t\t").toString();
                   }
 
                   //junta tudo em uma string só adicionando de volta a string } } que foi usada no split
-                  list = String.join("} }", strArray) + "} }";
+                  
+                  list = String.join("} }", strArray);
+                  
+                  if(strArray.length > 1)
+                  {
+                    list = list + "} }";
+                  }
+
                   if(entireLayerIsList == true)
                   {
                     //insere o delimitador de lista no final da lista caso todos os elementos façam parte dela

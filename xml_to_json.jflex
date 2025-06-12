@@ -24,9 +24,11 @@ NUMBER = {DIGIT}+
 LITERAL_STRING = \"([^\"\\]|\\.)*\"
 
 //TEXT = [a-zA-Z_0-9 ][a-zA-Z_0-9 ]+
-//COMMENT = <!--(.)*-->
+COMMENT = "<!"\-\-[^\n\r]*\-\-">"
 
 %%
+
+{COMMENT} { System.out.println("COMENTÁRIO" + yytext()); }
 
 "<" 		{System.out.println(yytext() + " OPEN_ANGLE"); return symbol(sym.OPEN_ANGLE);}
 ">" 		{System.out.println(yytext() + " CLOSE_ANGLE"); return symbol(sym.CLOSE_ANGLE);}
