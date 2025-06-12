@@ -28,7 +28,7 @@ COMMENT = "<!"\-\-[^\n\r]*\-\-">"
 
 %%
 
-{COMMENT} { System.out.println("COMENTÁRIO" + yytext()); }
+{COMMENT} { System.out.println("COMENTÁRIO" + yytext().trim()); }
 
 "<" 		{System.out.println(yytext() + " OPEN_ANGLE"); return symbol(sym.OPEN_ANGLE);}
 ">" 		{System.out.println(yytext() + " CLOSE_ANGLE"); return symbol(sym.CLOSE_ANGLE);}
@@ -44,11 +44,11 @@ COMMENT = "<!"\-\-[^\n\r]*\-\-">"
 
 //O Jflex NÃO permite criar um MACRO se o regex possui regra de exclusão
 //ID de uma tag não identificada --> <tag >
-[a-zA-Z_]+/(\s*>)|(\s*\/>)|(\s+[a-zA-Z]+=) {System.out.println(yytext() + " ID"); return symbol(sym.ID, yytext()); }
+[a-zA-Z_]+/(\s*>)|(\s*\/>)|(\s+[a-zA-Z]+=) {System.out.println(yytext().trim() + " ID"); return symbol(sym.ID, yytext().trim()); }
 
 //O Jflex NÃO permite criar um MACRO se o regex possui regra de exclusão
 //ID de uma tag identificada --> <tag id="placeholder">
-[a-zA-Z_]+/=  {System.out.println(yytext() + " ID"); return symbol(sym.ID, yytext());}
+[a-zA-Z_]+/=  {System.out.println(yytext().trim() + " ID"); return symbol(sym.ID, yytext().trim());}
 
 {NUMBER} {return symbol(sym.NUMBER, Integer.parseInt(yytext()));}
 
@@ -60,7 +60,7 @@ COMMENT = "<!"\-\-[^\n\r]*\-\-">"
 //TEXT
 //todo texto entre tags sempre aparece logo antes de um "OPEN_ANGLE <" da tag de fechamento
 //<tag> texto escrito aqui </tag>
-[a-zA-Z_0-9 ][a-zA-Z0-9,_\-':+#\. ]+/(\s*<) {System.out.println(yytext() + " TEXT"); return symbol(sym.TEXT, yytext());}
+\s*[a-zA-Z0-9,_\-':+#\.][a-zA-Z0-9,_\-':+#\.\s]+/< {System.out.println(yytext().trim() + " TEXT"); return symbol(sym.TEXT, yytext().trim().replace("\r\n","\\n"));}
 
 [ \t\r\n] {/* nothing */}
 . {System.err.println("Erro: Caractere inválido!" + yytext() + 
