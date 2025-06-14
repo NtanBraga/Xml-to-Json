@@ -1,1 +1,6 @@
-<texto><outro></outro><palavra></palavra></texto>
+<texto>
+    <outro>
+    </outro>
+    <palavra>
+    </palavra>
+</texto>
