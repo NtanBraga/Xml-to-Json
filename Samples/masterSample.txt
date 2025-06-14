@@ -1,38 +1,53 @@
-<texto></texto>
+<Exemplos>
+	<lista id="1">
+		<outro>
+		</outro>
+	</lista>
+	<lista id="2">
+		<outro>
+		</outro>
+	</lista>
+	<lista id="3">
+		<outro>
+		</outro>
+	</lista>
 
-<texto> alguma coisa aqui </texto>
+	<vazio></vazio>
 
-<texto>
-	<outro>
-	</outro>
-</texto>
+	<textoAqui> Texto Aqui </textoAqui>
 
-<texto>
-	<outro>
-		texto puro dentro ou numero puro
-	</outro>
-</texto>
+	<!-- This is a comment -->
 
-<texto id="abcd"></texto>
+	<objeto>
+		<propriedadeVazia>
+		</propriedadeVazia>
+	</objeto>
 
-<texto id="abcd">outras coisas aqui</texto>
+	<objetoOutro>
+		<propriedade>
+			Texto aqui
+		</propriedade>
+	</objetoOutro>
 
-<selfclose /> 
+	<objetoIdentificado id="abcd"></objetoIdentificado>
 
-<selfclose categoria="textos etc"/> 
+	<objetoIdentificadoNaoNulo id="abcd">Texto aqui</objetoIdentificadoNaoNulo>
 
-<texto>
-	<outro>
-	</outro>
-</texto>
-<texto>
-	<outro>
-	</outro>
-</texto>
+	<selfclose /> 
 
-<texto>
-<outro>
-</outro>
-<palavra>
-</palavra>
-</texto>
+	<selfcloseIdentificado categoria="Texto Aqui"/> 
+
+	<objeto>
+		<outro>
+		</outro>
+		<palavra>
+		</palavra>
+	</texto>
+
+	<objetoNesting>
+		<layer>
+			<maisLayer>
+			</maisLayer>
+		</layer>
+	</objetoNesting>
+</Exemplos>

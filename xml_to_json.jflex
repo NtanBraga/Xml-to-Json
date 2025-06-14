@@ -28,7 +28,7 @@ COMMENT = "<!"\-\-[^\n\r]*\-\-">"
 
 %%
 
-{COMMENT} { System.out.println("COMENTÁRIO" + yytext().trim()); }
+{COMMENT} { System.out.println(yytext().trim() + " COMENTÁRIO"); }
 
 "<" 		{System.out.println(yytext() + " OPEN_ANGLE"); return symbol(sym.OPEN_ANGLE);}
 ">" 		{System.out.println(yytext() + " CLOSE_ANGLE"); return symbol(sym.CLOSE_ANGLE);}

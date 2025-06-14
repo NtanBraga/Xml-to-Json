@@ -136,7 +136,7 @@ element ::= openElement:keyName TEXT:content closeElement
                   
                   list = String.join("} }", strArray);
                   
-                  if(strArray.length > 1)
+                  if(strArray.length > 1 && entireLayerIsList == true)
                   {
                     list = list + "} }";
                   }
@@ -201,7 +201,7 @@ selfCloseElement ::= OPEN_ANGLE ID:keyName SLASH CLOSE_ANGLE
                      :} 
                      ;
 
-//<termo id="placeholder">
+//<termo id="placeholder"/>
 selfCloseIdentifiedElement ::= OPEN_ANGLE ID:keyName ID:propKey ASSIGN LITERAL_STRING:propContent SLASH CLOSE_ANGLE 
                             {: 
                                 //formatação --> "keyName": {"propKey":"propContent"}
