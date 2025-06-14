@@ -37,12 +37,12 @@
 
 	<selfcloseIdentificado categoria="Texto Aqui"/> 
 
-	<objeto>
+	<objetoVariosItens>
 		<outro>
 		</outro>
 		<palavra>
 		</palavra>
-	</texto>
+	</objetoVariosItens>
 
 	<objetoNesting>
 		<layer>
