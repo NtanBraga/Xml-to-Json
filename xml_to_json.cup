@@ -34,60 +34,20 @@ parser code
 terminal OPEN_ANGLE, CLOSE_ANGLE, SLASH, ASSIGN, LESS_THAN, GREATER_THAN, 
          AMPERSAND, APOSTROPHE, QUOTE_MARK;
 
-terminal String LITERAL_STRING, TEXT, ID, COMMENT;
+terminal String LITERAL_STRING, TEXT, ID;
 terminal Integer NUMBER;
 
-non terminal xml, element, elementList, openElement, closeElement, selfCloseElement, openIdentifiedElement, selfCloseIdentifiedElement, commentList;
+non terminal xml, element, elementList, openElement, closeElement, selfCloseElement, openIdentifiedElement, selfCloseIdentifiedElement;
 
-xml ::= commentList:comments elementList:text
-                              {:
-                                String result = "";
-                                if (!comments.toString().isEmpty()) {
-                                  result = "\"comment\":[" + comments + "]";
-                                if (!text.toString().isEmpty()) {
-                                  result += ",\n\t" + text;
-                                }
-                                } else {
-                                  result = text.toString();
-                                }
-                                stringJson.append(result);
-                                RESULT = result;
-                              :}
-      | elementList:text {: stringJson.append(text); RESULT = text; :}
-      | commentList:comment {: String result = "\"comment\":[" + comment + "]";
-                               stringJson.append(result);
-                               RESULT = result; :}
-                            ;
+xml ::= elementList:text {: stringJson.append(text); RESULT = text; :};
 
-commentList ::= commentList:list COMMENT:comment
-                {:
-                  String result = list.toString().isEmpty() ? "\"" + comment + "\"" : list + ",\"" + comment + "\"";
-                  RESULT = result;
-                :}
-                | COMMENT:comment
-                {: RESULT = "\"" + comment + "\""; :}
-                ;
 
-element ::= 
-              openElement:keyName commentList:comments elementList:list closeElement
-              {:
-                  RESULT = "\"" + keyName + "\":{\"comment\":["+ comments + "],\n\t" + list + "}";
-              :}
-            |  
-              openElement:keyName commentList:comments TEXT:content closeElement
-              {:
-                  RESULT = "\"" + keyName + "\":{\"comment\":[" + comments + "],\"data\":\"" + content + "\"}";
-              :}
-            |
-              openElement:keyName TEXT:content closeElement
+element ::= openElement:keyName TEXT:content closeElement
               {: 
                   //formatação --> "keyname":"content"
                   RESULT = "\"" + keyName + "\":" + "\"" + content + "\""; 
               :}
-            | openElement:keyName commentList:comments closeElement
-              {:
-                    RESULT = "\"" + keyName + "\":{\"comment\":[" + comments + "]}";
-              :}
+        
             | openIdentifiedElement:identifiedElement TEXT:content closeElement
               {: 
                   //formatação --> "keyname":{"propKey":"propContent", "data":"content" }
@@ -214,11 +174,7 @@ element ::=
 
 //possibilita expansão horizontal (um item do lado do outro)
 //também possibilita recursão de itens (um item dentro do outro dentro do outro dentro do outro)
-elementList ::= elementList:list commentList:comments element:element
-                {:
-                  RESULT = list.toString() + ",\n\t" + "\"comment\":[" + comments + "],\n\t" + element;
-                :}
-              | elementList:list element:element  {: RESULT = list.toString() + ",\n\t" + element; :}
+elementList ::= elementList:list element:element  {: RESULT = list.toString() + ",\n\t" + element; :}
               | element:item {: RESULT = item.toString(); :} 
                ;
 

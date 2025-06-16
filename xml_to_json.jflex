@@ -28,7 +28,6 @@ COMMENT = "<!--"[^\-]*"-->"
 
 %%
 
-{COMMENT} { System.out.println(yytext().trim() + " COMENTÁRIO"); }
 
 "<" 		{System.out.println(yytext() + " OPEN_ANGLE"); return symbol(sym.OPEN_ANGLE);}
 ">" 		{System.out.println(yytext() + " CLOSE_ANGLE"); return symbol(sym.CLOSE_ANGLE);}
@@ -56,9 +55,7 @@ COMMENT = "<!--"[^\-]*"-->"
                    return symbol(sym.LITERAL_STRING, 
                    '\"' + yytext().substring(1, yytext().length() -1) + '\"'); } //(index, index) não inclusivo
 
-{COMMENT} { String string_comment = yytext().substring(4, yytext().length() - 3);
-            System.out.println("COMENTÁRIO: (line " + (yyline + 1) + "):" + string_comment );
-            return symbol(sym.COMMENT, string_comment);}
+{COMMENT} { /*nothing*/ }
 
 //O Jflex NÃO permite criar um MACRO se o regex possui regra de exclusão
 //TEXT
